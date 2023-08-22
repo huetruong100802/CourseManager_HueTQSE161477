@@ -17,7 +17,7 @@ namespace CourseManager.Repo.Models
             : base(options)
         {
         }
-
+        #region DbSets
         public virtual DbSet<Attendance> Attendances { get; set; }
         public virtual DbSet<Course> Courses { get; set; }
         public virtual DbSet<Major> Majors { get; set; }
@@ -29,7 +29,7 @@ namespace CourseManager.Repo.Models
         public virtual DbSet<StudentInCourse> StudentInCourses { get; set; }
         public virtual DbSet<Subject> Subjects { get; set; }
         public virtual DbSet<User> Users { get; set; }
-
+        #endregion
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
@@ -43,9 +43,9 @@ namespace CourseManager.Repo.Models
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsetting.json", optional: true, reloadOnChange: true);
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
             IConfiguration configuration = builder.Build();
-            var connectionString = configuration.GetConnectionString("DefaultConnection");
+            var connectionString = configuration.GetConnectionString("DatabaseConnection");
             return connectionString;
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)

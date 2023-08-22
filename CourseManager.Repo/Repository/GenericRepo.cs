@@ -31,7 +31,7 @@ namespace CourseManager.Repo.Repository
             return await includes
            .Aggregate(_dbSet.AsQueryable(),
                (entity, property) => entity.Include(property))
-           .Where(x => x.Status == BaseStatus.Inactive)
+           .Where(x => x.Status == BaseStatus.Active)
            .ToListAsync();
         }
 
