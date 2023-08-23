@@ -19,10 +19,4 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.16" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Pages\UserManagement\" />
-    <Folder Include="Pages\UserManagement\Roles\" />
-    <Folder Include="Pages\UserManagement\Users\" />
-  </ItemGroup>
-
 </Project>
