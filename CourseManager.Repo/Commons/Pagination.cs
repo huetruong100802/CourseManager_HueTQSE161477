@@ -8,8 +8,8 @@ namespace CourseManager.Repo.Commons
 {
     public class Pagination<T>
     {
-        public int TotalItemsCount { get; set; }
-        public int PageIndex { get; set; }
+        public int TotalItemsCount { get; set; } = 0;
+        public int PageIndex { get; set; } = 1;
         public int PageSize { get; set; }
         public ICollection<T> Items { get; set; }
 

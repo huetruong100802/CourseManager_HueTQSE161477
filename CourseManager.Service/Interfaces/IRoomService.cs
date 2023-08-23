@@ -3,5 +3,5 @@ using CourseManager.Service.ViewModels;
 
 namespace CourseManager.Service.Interfaces
 {
-    public interface IRoomService : IService<RoomViewModel> { }
+    public interface IRoomService : IService<Room> { }
 }

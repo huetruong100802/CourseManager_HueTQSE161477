@@ -20,7 +20,7 @@ namespace CourseManager.Service
     {
         public static IServiceCollection AddService(this IServiceCollection services, string databaseConnection)
         {
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddTransient<IUnitOfWork, UnitOfWork>();
             #region Services
             services.AddScoped<IAttendanceService, AttendanceService>();
             services.AddScoped<ICourseService, CourseService>();
@@ -48,6 +48,7 @@ namespace CourseManager.Service
             services.AddScoped<IUserRepo, UserRepo>();
             #endregion
             services.AddDbContext<CourseManagerDBContext>(option => option.UseSqlServer(databaseConnection).EnableSensitiveDataLogging(), ServiceLifetime.Scoped);
+            services.AddScoped<CourseManagerDBContext>();
             services.AddAutoMapper(typeof(MapperConfigurationsProfile).Assembly);
             services.AddScoped<IMapper, Mapper>();
             return services;

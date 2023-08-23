@@ -14,15 +14,18 @@ namespace CourseManager.Repo.Repository
 {
     public class GenericRepo<TEntity> : IGenericRepo<TEntity> where TEntity : BaseEntity
     {
+        protected readonly CourseManagerDBContext _context;
         protected DbSet<TEntity> _dbSet;
 
         public GenericRepo(CourseManagerDBContext context)
         {
-            _dbSet =context.Set<TEntity>();
+            _context = context;
+            _dbSet = context.Set<TEntity>();
         }
 
         public async Task AddAsync(TEntity entity)
         {
+            entity.Id = _dbSet.OrderBy(x => x.Id).Last().Id+1;
             await _dbSet.AddAsync(entity);
         }
 
@@ -31,22 +34,31 @@ namespace CourseManager.Repo.Repository
             return await includes
            .Aggregate(_dbSet.AsQueryable(),
                (entity, property) => entity.Include(property))
-           .Where(x => x.Status == BaseStatus.Active)
+           .OrderBy(x => x.Id)
            .ToListAsync();
         }
 
         public async Task<TEntity?> GetByIdAsync(int id, params Expression<Func<TEntity, object>>[] includes)
         {
-            return await includes
+            var query = includes
                .Aggregate(_dbSet.AsQueryable(),
                    (entity, property) => entity.Include(property))
-               .AsNoTracking()
-               .FirstOrDefaultAsync(x => x.Id.Equals(id) && x.Status == BaseStatus.Inactive);
+               .AsNoTracking();
+            return await query.SingleOrDefaultAsync(x => x.Id.Equals(id));
+        }
+        public async Task<TEntity?> GetAsync(params Expression<Func<TEntity, object>>[] includes)
+        {
+            var query = includes
+               .Aggregate(_dbSet.AsQueryable(),
+                   (entity, property) => entity.Include(property))
+               .AsNoTracking();
+            return await query.FirstAsync();
         }
 
         public void SoftRemove(TEntity entity)
         {
-            entity.Status = BaseStatus.Active;
+            _context.ChangeTracker.Clear();
+            entity.Status = BaseStatus.Inactive;
             _dbSet.Update(entity);
         }
 
@@ -71,6 +83,7 @@ namespace CourseManager.Repo.Repository
             var items = await value.Where(expression)
                                     .Skip(pageIndex * pageSize)
                                     .Take(pageSize)
+                                    .OrderBy(x => x.Id)
                                     .AsNoTracking()
                                     .ToListAsync();
 
@@ -84,5 +97,6 @@ namespace CourseManager.Repo.Repository
 
             return result;
         }
+
     }
 }

@@ -1,9 +1,11 @@
-﻿using CourseManager.Repo.Models;
+﻿using CourseManager.Repo.Commons;
+using CourseManager.Repo.Models;
 using CourseManager.Repo.UnitOfWorks;
 using CourseManager.Service.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -30,6 +32,11 @@ namespace CourseManager.Service.Services
             return await _unitOfWork.SaveChangeAsync() > 0;
         }
 
+        public async Task<Major> Get(params Expression<Func<Major, object>>[] includes)
+        {
+            return (await _unitOfWork.MajorRepo.GetAsync(includes))!;
+        }
+
         public async Task<List<Major>> GetAll()
         {
             return await _unitOfWork.MajorRepo.GetAllAsync();
@@ -38,6 +45,11 @@ namespace CourseManager.Service.Services
         public async Task<Major> GetById(int id)
         {
             return (await _unitOfWork.MajorRepo.GetByIdAsync(id))!;
+        }
+
+        public async Task<Pagination<Major>> GetByPage(int page, int pageSize)
+        {
+            return await _unitOfWork.MajorRepo.ToPagination(page, pageSize);
         }
 
         public async Task<bool> Update(Major item)

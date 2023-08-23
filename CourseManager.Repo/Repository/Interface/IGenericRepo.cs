@@ -8,6 +8,7 @@ namespace CourseManager.Repo.Repository.Interface
     {
         Task<List<TEntity>> GetAllAsync(params Expression<Func<TEntity, object>>[] includes);
         Task<TEntity?> GetByIdAsync(int id, params Expression<Func<TEntity, object>>[] includes);
+        Task<TEntity?> GetAsync(params Expression<Func<TEntity, object>>[] includes);
         Task AddAsync(TEntity entity);
         void Update(TEntity entity);
         void SoftRemove(TEntity entity);
