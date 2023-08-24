@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CourseManager.Repo.Enums;
+using System;
 using System.Collections.Generic;
 
 #nullable disable
@@ -11,6 +12,7 @@ namespace CourseManager.Repo.Models
         public int SessionId { get; set; }
         public string Description { get; set; }
         public DateTime? AttendanceDate { get; set; }
+        public new AttendanceStatus Status { get; set; } = AttendanceStatus.Unchecked;
 
         public virtual Session Session { get; set; }
         public virtual StudentInCourse StudentInCourse { get; set; }

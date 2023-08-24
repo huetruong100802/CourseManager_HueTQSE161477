@@ -6,16 +6,21 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using CourseManager.Repo.Models;
+using AutoMapper;
+using CourseManager.Service.Interfaces;
+using CourseManager.Service.ViewModels;
 
 namespace CourseManager.Pages.UserManagement.Roles
 {
     public class CreateModel : PageModel
     {
-        private readonly CourseManager.Repo.Models.CourseManagerDBContext _context;
+        private readonly IRoleService _context;
+        private readonly IMapper _mapper;
 
-        public CreateModel(CourseManager.Repo.Models.CourseManagerDBContext context)
+        public CreateModel(IRoleService context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         public IActionResult OnGet()
@@ -24,19 +29,18 @@ namespace CourseManager.Pages.UserManagement.Roles
         }
 
         [BindProperty]
-        public Role Role { get; set; } = default!;
-        
+        public RoleViewModel Role { get; set; } = default!;
+
 
         // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
         public async Task<IActionResult> OnPostAsync()
         {
-          if (!ModelState.IsValid || _context.Roles == null || Role == null)
+            if (!ModelState.IsValid || await _context.GetAll() == null || Role == null)
             {
                 return Page();
             }
 
-            _context.Roles.Add(Role);
-            await _context.SaveChangesAsync();
+            await _context.Add(_mapper.Map<Role>(Role));
 
             return RedirectToPage("./Index");
         }

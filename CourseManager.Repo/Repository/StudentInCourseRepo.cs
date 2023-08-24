@@ -1,5 +1,6 @@
 ﻿using CourseManager.Repo.Models;
 using CourseManager.Repo.Repository.Interface;
+using Microsoft.EntityFrameworkCore;
 
 namespace CourseManager.Repo.Repository
 {
@@ -7,6 +8,11 @@ namespace CourseManager.Repo.Repository
     {
         public StudentInCourseRepo(CourseManagerDBContext context) : base(context)
         {
+        }
+
+        public bool CheckStudentInCourse(int studentId, int courseId)
+        {
+            return _dbSet.Any(u => u.StudentId == studentId && u.CourseId == courseId);
         }
     }
 }

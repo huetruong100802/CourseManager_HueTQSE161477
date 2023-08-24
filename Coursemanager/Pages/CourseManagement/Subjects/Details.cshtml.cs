@@ -6,35 +6,40 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using CourseManager.Repo.Models;
+using AutoMapper;
+using CourseManager.Service.Interfaces;
+using CourseManager.Service.ViewModels;
 
 namespace CourseManager.Pages.Subjects
 {
     public class DetailsModel : PageModel
     {
-        private readonly CourseManager.Repo.Models.CourseManagerDBContext _context;
+        private readonly ISubjectService _context;
+        private readonly IMapper _mapper;
 
-        public DetailsModel(CourseManager.Repo.Models.CourseManagerDBContext context)
+        public DetailsModel(ISubjectService context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
-      public Subject Subject { get; set; } = default!; 
+        public SubjectViewModel Subject { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
-            if (id == null || _context.Subjects == null)
+            if (id == null || await _context.GetAll() == null)
             {
                 return NotFound();
             }
 
-            var subject = await _context.Subjects.FirstOrDefaultAsync(m => m.Id == id);
+            var subject = await _context.Get(u => u.Id == id,x=> x.Major);
             if (subject == null)
             {
                 return NotFound();
             }
-            else 
+            else
             {
-                Subject = subject;
+                Subject = _mapper.Map<SubjectViewModel>(subject);
             }
             return Page();
         }

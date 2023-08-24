@@ -7,34 +7,39 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CourseManager.Repo.Models;
+using AutoMapper;
+using CourseManager.Service.Interfaces;
+using CourseManager.Service.ViewModels;
 
 namespace CourseManager.Pages.Majors
 {
     public class EditModel : PageModel
     {
-        private readonly CourseManager.Repo.Models.CourseManagerDBContext _context;
+        private readonly IMajorService _context;
+        private readonly IMapper _mapper;
 
-        public EditModel(CourseManager.Repo.Models.CourseManagerDBContext context)
+        public EditModel(IMajorService context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         [BindProperty]
-        public Major Major { get; set; } = default!;
+        public MajorViewModel Major { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
-            if (id == null || _context.Majors == null)
+            if (id == null || await _context.GetAll() == null)
             {
                 return NotFound();
             }
 
-            var major =  await _context.Majors.FirstOrDefaultAsync(m => m.Id == id);
+            var major = await _context.GetById((int)id);
             if (major == null)
             {
                 return NotFound();
             }
-            Major = major;
+            Major = _mapper.Map<MajorViewModel>(major);
             return Page();
         }
 
@@ -47,15 +52,13 @@ namespace CourseManager.Pages.Majors
                 return Page();
             }
 
-            _context.Attach(Major).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                await _context.Update(_mapper.Map<Major>(Major));
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!MajorExists(Major.Id))
+                if (!await MajorExists(Major.Id))
                 {
                     return NotFound();
                 }
@@ -68,9 +71,9 @@ namespace CourseManager.Pages.Majors
             return RedirectToPage("./Index");
         }
 
-        private bool MajorExists(int id)
+        private async Task<bool> MajorExists(int id)
         {
-          return (_context.Majors?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (await _context.GetById(id) != null);
         }
     }
 }

@@ -6,54 +6,57 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using CourseManager.Repo.Models;
+using AutoMapper;
+using CourseManager.Service.Interfaces;
+using CourseManager.Service.ViewModels;
 
 namespace CourseManager.Pages.Courses
 {
     public class DeleteModel : PageModel
     {
-        private readonly CourseManager.Repo.Models.CourseManagerDBContext _context;
-
-        public DeleteModel(CourseManager.Repo.Models.CourseManagerDBContext context)
+        private readonly ICourseService _context;
+        private readonly IMapper _mapper;
+        public DeleteModel(ICourseService context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         [BindProperty]
-      public Course Course { get; set; } = default!;
+        public CourseViewModel Course { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
-            if (id == null || _context.Courses == null)
+            if (id == null || await _context.GetAll() == null)
             {
                 return NotFound();
             }
 
-            var course = await _context.Courses.FirstOrDefaultAsync(m => m.Id == id);
+            var course = await _context.Get(u=>u.Id==id,x=>x.Semester,y=>y.Subject);
 
             if (course == null)
             {
                 return NotFound();
             }
-            else 
+            else
             {
-                Course = course;
+                Course = _mapper.Map<CourseViewModel>(course);
             }
             return Page();
         }
 
         public async Task<IActionResult> OnPostAsync(int? id)
         {
-            if (id == null || _context.Courses == null)
+            if (id == null || await _context.GetAll() == null)
             {
                 return NotFound();
             }
-            var course = await _context.Courses.FindAsync(id);
+            var course = await _context.GetById((int)id);
 
             if (course != null)
             {
-                Course = course;
-                _context.Courses.Remove(Course);
-                await _context.SaveChangesAsync();
+                await _context.Delete(course);
+                Course = _mapper.Map<CourseViewModel>(course);
             }
 
             return RedirectToPage("./Index");

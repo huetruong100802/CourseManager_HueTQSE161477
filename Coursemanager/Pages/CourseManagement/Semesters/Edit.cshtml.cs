@@ -7,34 +7,39 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CourseManager.Repo.Models;
+using AutoMapper;
+using CourseManager.Service.Interfaces;
+using CourseManager.Service.ViewModels;
 
 namespace CourseManager.Pages.Semesters
 {
     public class EditModel : PageModel
     {
-        private readonly CourseManager.Repo.Models.CourseManagerDBContext _context;
+        private readonly ISemesterService _context;
+        private readonly IMapper _mapper;
 
-        public EditModel(CourseManager.Repo.Models.CourseManagerDBContext context)
+        public EditModel(ISemesterService context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         [BindProperty]
-        public Semester Semester { get; set; } = default!;
+        public SemesterViewModel Semester { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
-            if (id == null || _context.Semesters == null)
+            if (id == null || await _context.GetAll() == null)
             {
                 return NotFound();
             }
 
-            var semester =  await _context.Semesters.FirstOrDefaultAsync(m => m.Id == id);
+            var semester = await _context.GetById((int)id);
             if (semester == null)
             {
                 return NotFound();
             }
-            Semester = semester;
+            Semester = _mapper.Map<SemesterViewModel>(semester);
             return Page();
         }
 
@@ -47,15 +52,13 @@ namespace CourseManager.Pages.Semesters
                 return Page();
             }
 
-            _context.Attach(Semester).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                await _context.Update(_mapper.Map<Semester>(Semester));
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!SemesterExists(Semester.Id))
+                if (!await SemesterExists(Semester.Id))
                 {
                     return NotFound();
                 }
@@ -68,9 +71,9 @@ namespace CourseManager.Pages.Semesters
             return RedirectToPage("./Index");
         }
 
-        private bool SemesterExists(int id)
+        private async Task<bool> SemesterExists(int id)
         {
-          return (_context.Semesters?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (await _context.GetById(id) != null);
         }
     }
 }

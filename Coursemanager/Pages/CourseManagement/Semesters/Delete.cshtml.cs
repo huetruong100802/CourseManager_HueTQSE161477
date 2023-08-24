@@ -6,54 +6,57 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using CourseManager.Repo.Models;
+using AutoMapper;
+using CourseManager.Service.Interfaces;
+using CourseManager.Service.ViewModels;
 
 namespace CourseManager.Pages.Semesters
 {
     public class DeleteModel : PageModel
     {
-        private readonly CourseManager.Repo.Models.CourseManagerDBContext _context;
-
-        public DeleteModel(CourseManager.Repo.Models.CourseManagerDBContext context)
+        private readonly ISemesterService _context;
+        private readonly IMapper _mapper;
+        public DeleteModel(ISemesterService context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         [BindProperty]
-      public Semester Semester { get; set; } = default!;
+        public SemesterViewModel Semester { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
-            if (id == null || _context.Semesters == null)
+            if (id == null || await _context.GetAll() == null)
             {
                 return NotFound();
             }
 
-            var semester = await _context.Semesters.FirstOrDefaultAsync(m => m.Id == id);
+            var semester = await _context.GetById((int)id);
 
             if (semester == null)
             {
                 return NotFound();
             }
-            else 
+            else
             {
-                Semester = semester;
+                Semester = _mapper.Map<SemesterViewModel>(semester);
             }
             return Page();
         }
 
         public async Task<IActionResult> OnPostAsync(int? id)
         {
-            if (id == null || _context.Semesters == null)
+            if (id == null || await _context.GetAll() == null)
             {
                 return NotFound();
             }
-            var semester = await _context.Semesters.FindAsync(id);
+            var semester = await _context.GetById((int)id);
 
             if (semester != null)
             {
-                Semester = semester;
-                _context.Semesters.Remove(Semester);
-                await _context.SaveChangesAsync();
+                await _context.Delete(semester);
+                Semester = _mapper.Map<SemesterViewModel>(semester);
             }
 
             return RedirectToPage("./Index");

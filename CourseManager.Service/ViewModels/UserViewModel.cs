@@ -9,9 +9,11 @@ namespace CourseManager.Service.ViewModels
 {
     public partial class UserViewModel : BaseEntity
     {
+        [Required]
         public string Username { get; set; }
-        [DataType(DataType.Password)]
+        [Required]
         public string Password { get; set; }
+        [Required]
         public string Email { get; set; }
         public int RoleId { get; set; }
 

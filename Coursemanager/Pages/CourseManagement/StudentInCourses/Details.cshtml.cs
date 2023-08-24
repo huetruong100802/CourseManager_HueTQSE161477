@@ -10,20 +10,20 @@ using AutoMapper;
 using CourseManager.Service.Interfaces;
 using CourseManager.Service.ViewModels;
 
-namespace CourseManager.Pages.Sessions
+namespace CourseManager.Pages.CourseManagement.StudentInCourses
 {
     public class DetailsModel : PageModel
     {
-        private readonly ISessionService _context;
+        private readonly IStudentInCourseService _context;
         private readonly IMapper _mapper;
 
-        public DetailsModel(ISessionService context, IMapper mapper)
+        public DetailsModel(IStudentInCourseService context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
         }
 
-        public SessionViewModel Session { get; set; } = default!;
+        public StudentInCourseViewModel StudentInCourse { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -32,14 +32,14 @@ namespace CourseManager.Pages.Sessions
                 return NotFound();
             }
 
-            var session = await _context.GetById((int)id);
-            if (session == null)
+            var studentInCourse = await _context.Get(u => u.Id == id, x => x.Course, y => y.Student);
+            if (studentInCourse == null)
             {
                 return NotFound();
             }
             else
             {
-                Session = _mapper.Map<SessionViewModel>(session);
+                StudentInCourse = _mapper.Map<StudentInCourseViewModel>(studentInCourse);
             }
             return Page();
         }

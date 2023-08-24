@@ -7,36 +7,45 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CourseManager.Repo.Models;
+using AutoMapper;
+using CourseManager.Service.Interfaces;
+using CourseManager.Service.ViewModels;
 
 namespace CourseManager.Pages.Courses
 {
     public class EditModel : PageModel
     {
-        private readonly CourseManager.Repo.Models.CourseManagerDBContext _context;
+        private readonly ICourseService _context;
+        private readonly ISemesterService _semesterService;
+        private readonly ISubjectService _subjectService;
+        private readonly IMapper _mapper;
 
-        public EditModel(CourseManager.Repo.Models.CourseManagerDBContext context)
+        public EditModel(ICourseService context, IMapper mapper, ISemesterService semesterService, ISubjectService subjectService)
         {
             _context = context;
+            _mapper = mapper;
+            _semesterService = semesterService;
+            _subjectService = subjectService;
         }
 
         [BindProperty]
-        public Course Course { get; set; } = default!;
+        public CourseViewModel Course { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
-            if (id == null || _context.Courses == null)
+            if (id == null || await _context.GetAll() == null)
             {
                 return NotFound();
             }
 
-            var course =  await _context.Courses.FirstOrDefaultAsync(m => m.Id == id);
+            var course = await _context.Get(u => u.Id == id, x => x.Semester, y => y.Subject);
             if (course == null)
             {
                 return NotFound();
             }
-            Course = course;
-           ViewData["SemesterId"] = new SelectList(_context.Semesters, "Id", "Name");
-           ViewData["SubjectId"] = new SelectList(_context.Subjects, "Id", "Name");
+            Course = _mapper.Map<CourseViewModel>(course);
+            ViewData["SemesterId"] = new SelectList(await _semesterService.GetAll(), "Id", "Name");
+            ViewData["SubjectId"] = new SelectList(await _subjectService.GetAll(), "Id", "Name");
             return Page();
         }
 
@@ -49,15 +58,13 @@ namespace CourseManager.Pages.Courses
                 return Page();
             }
 
-            _context.Attach(Course).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                await _context.Update(_mapper.Map<Course>(Course));
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!CourseExists(Course.Id))
+                if (!await CourseExists(Course.Id))
                 {
                     return NotFound();
                 }
@@ -70,9 +77,9 @@ namespace CourseManager.Pages.Courses
             return RedirectToPage("./Index");
         }
 
-        private bool CourseExists(int id)
+        private async Task<bool> CourseExists(int id)
         {
-          return (_context.Courses?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (await _context.GetById(id) != null);
         }
     }
 }

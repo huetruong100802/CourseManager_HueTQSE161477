@@ -32,10 +32,21 @@ namespace WebApplication1
                 options.Conventions.AuthorizeFolder("/CourseManagement/Majors", ADMIN_POLICY);
                 options.Conventions.AuthorizeFolder("/CourseManagement/Rooms", ADMIN_POLICY);
                 options.Conventions.AuthorizeFolder("/CourseManagement/Semesters", ADMIN_POLICY);
-                options.Conventions.AuthorizeFolder("/CourseManagement/Sessions", ADMIN_POLICY);
                 options.Conventions.AuthorizeFolder("/CourseManagement/Students", ADMIN_POLICY);
                 options.Conventions.AuthorizeFolder("/CourseManagement/Subjects", ADMIN_POLICY);
                 options.Conventions.AuthorizeFolder("/CourseManagement/Courses", LECTURER_POLICY);
+                options.Conventions.AuthorizePage("/CourseManagement/Courses/Create", ADMIN_POLICY);
+                options.Conventions.AuthorizePage("/CourseManagement/Courses/Edit", ADMIN_POLICY);
+                options.Conventions.AuthorizePage("/CourseManagement/Courses/Delete", ADMIN_POLICY);
+                options.Conventions.AuthorizeFolder("/CourseManagement/Sessions", LECTURER_POLICY);
+                options.Conventions.AuthorizePage("/CourseManagement/Sessions/Create", ADMIN_POLICY);
+                options.Conventions.AuthorizePage("/CourseManagement/Sessions/Edit", ADMIN_POLICY);
+                options.Conventions.AuthorizePage("/CourseManagement/Sessions/Delete", ADMIN_POLICY);
+                options.Conventions.AuthorizeFolder("/CourseManagement/StudentInCourses", LECTURER_POLICY);
+                options.Conventions.AuthorizePage("/CourseManagement/StudentInCourses/Create", ADMIN_POLICY);
+                options.Conventions.AuthorizePage("/CourseManagement/StudentInCourses/Edit", ADMIN_POLICY);
+                options.Conventions.AuthorizePage("/CourseManagement/StudentInCourses/Delete", ADMIN_POLICY);
+                options.Conventions.AuthorizeFolder("/UserManagement", ADMIN_POLICY);
             });
             var app = builder.Build();
 

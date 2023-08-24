@@ -11,23 +11,25 @@ using AutoMapper;
 using CourseManager.Service.Interfaces;
 using CourseManager.Service.ViewModels;
 
-namespace CourseManager.Pages.Students
+namespace CourseManager.Pages.CourseManagement.StudentInCourses
 {
     public class EditModel : PageModel
     {
-        private readonly IStudentService _context;
-        private readonly IMajorService _majorService;
+        private readonly IStudentInCourseService _context;
+        private readonly ICourseService _courseService;
+        private readonly IStudentService _studentService;
         private readonly IMapper _mapper;
 
-        public EditModel(IStudentService context, IMapper mapper, IMajorService majorService)
+        public EditModel(IStudentInCourseService context, IMapper mapper, ICourseService courseService, IStudentService studentService)
         {
             _context = context;
             _mapper = mapper;
-            _majorService = majorService;
+            _courseService = courseService;
+            _studentService = studentService;
         }
 
         [BindProperty]
-        public StudentViewModel Student { get; set; } = default!;
+        public StudentInCourseViewModel StudentInCourse { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -36,13 +38,12 @@ namespace CourseManager.Pages.Students
                 return NotFound();
             }
 
-            var student = await _context.GetById((int)id);
-            if (student == null)
+            var studentInCourse = await _context.Get(u=>u.Id==id,x=>x.Course, y=>y.Student);
+            if (studentInCourse == null)
             {
                 return NotFound();
             }
-            Student = _mapper.Map<StudentViewModel>(student);
-            ViewData["MajorId"] = new SelectList(await _majorService.GetAll(), "Id", "Name");
+            StudentInCourse = _mapper.Map<StudentInCourseViewModel>(studentInCourse);
             return Page();
         }
 
@@ -57,11 +58,11 @@ namespace CourseManager.Pages.Students
 
             try
             {
-                await _context.Update(_mapper.Map<Student>(Student));
+                await _context.Update(_mapper.Map<CourseManager.Repo.Models.StudentInCourse> (StudentInCourse));
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!await StudentExists(Student.Id))
+                if (!await StudentInCourseExists(StudentInCourse.Id))
                 {
                     return NotFound();
                 }
@@ -70,11 +71,10 @@ namespace CourseManager.Pages.Students
                     throw;
                 }
             }
-
-            return RedirectToPage("./Index");
+            return RedirectToPage("./Index", new { courseId = StudentInCourse.CourseId});
         }
 
-        private async Task<bool> StudentExists(int id)
+        private async Task<bool> StudentInCourseExists(int id)
         {
             return (await _context.GetById(id) != null);
         }

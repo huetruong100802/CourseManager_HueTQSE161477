@@ -7,35 +7,42 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CourseManager.Repo.Models;
+using AutoMapper;
+using CourseManager.Service.Interfaces;
+using CourseManager.Service.ViewModels;
 
 namespace CourseManager.Pages.Subjects
 {
     public class EditModel : PageModel
     {
-        private readonly CourseManager.Repo.Models.CourseManagerDBContext _context;
+        private readonly ISubjectService _context;
+        private readonly IMajorService _majorService;
+        private readonly IMapper _mapper;
 
-        public EditModel(CourseManager.Repo.Models.CourseManagerDBContext context)
+        public EditModel(ISubjectService context, IMapper mapper, IMajorService majorService)
         {
             _context = context;
+            _mapper = mapper;
+            _majorService = majorService;
         }
 
         [BindProperty]
-        public Subject Subject { get; set; } = default!;
+        public SubjectViewModel Subject { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
-            if (id == null || _context.Subjects == null)
+            if (id == null || await _context.GetAll() == null)
             {
                 return NotFound();
             }
 
-            var subject =  await _context.Subjects.FirstOrDefaultAsync(m => m.Id == id);
+            var subject = await _context.GetById((int)id);
             if (subject == null)
             {
                 return NotFound();
             }
-            Subject = subject;
-           ViewData["MajorId"] = new SelectList(_context.Majors, "Id", "Name");
+            Subject = _mapper.Map<SubjectViewModel>(subject);
+            ViewData["MajorId"] = new SelectList(await _majorService.GetAll(), "Id", "Name");
             return Page();
         }
 
@@ -48,15 +55,13 @@ namespace CourseManager.Pages.Subjects
                 return Page();
             }
 
-            _context.Attach(Subject).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                await _context.Update(_mapper.Map<Subject>(Subject));
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!SubjectExists(Subject.Id))
+                if (!await SubjectExists(Subject.Id))
                 {
                     return NotFound();
                 }
@@ -69,9 +74,9 @@ namespace CourseManager.Pages.Subjects
             return RedirectToPage("./Index");
         }
 
-        private bool SubjectExists(int id)
+        private async Task<bool> SubjectExists(int id)
         {
-          return (_context.Subjects?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (await _context.GetById(id) != null);
         }
     }
 }

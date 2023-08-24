@@ -1,5 +1,5 @@
 ﻿@page
-@model CourseManager.Pages.Sessions.IndexModel
+@model CourseManager.Pages.CourseManagement.StudentInCourses.IndexModel
 
 @{
     ViewData["Title"] = "Index";
@@ -7,50 +7,48 @@
     var isAdmin = ((System.Security.Claims.ClaimsIdentity)User.Identity!).HasClaim(System.Security.Claims.ClaimTypes.Role, "Admin");
 }
 
-<h1>Index</h1>
+<h1>@Model.Course.Name | <a class="link-info" asp-page="/CourseManagement/Courses/Details" asp-route-id="@Model.Course.Id">Details</a></h1>
 
 <p>
-    <a asp-page="Create" class="btn btn-primary">Create New +</a>
+    @if (isAdmin)
+    {
+        <a asp-page="Create" class="btn btn-primary" asp-route-courseId="@Model.Course.Id">Add New Student</a>
+    }
     <form class="d-flex" asp-page="Index" method="get">
         <input class="form-control me-sm-2" type="search" placeholder="Search" asp-for="@Model.SearchString">
+        <input type="hidden" name="courseId" value="@Model.Course.Id" />
         <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
     </form>
 </p>
 <table class="table">
     <thead>
-        <tr>
+        <tr class="table-secondary">
             <th>
-                @Html.DisplayNameFor(model => model.Session[0].StartTime)
+                @Html.DisplayNameFor(model => model.StudentInCourse[0].Course)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Session[0].EndTime)
+                @Html.DisplayNameFor(model => model.StudentInCourse[0].Student)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Session[0].Course)
+                @Html.DisplayNameFor(model => model.StudentInCourse[0].Student.Code)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Session[0].Room)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Session[0].Status)
+                @Html.DisplayNameFor(model => model.StudentInCourse[0].Status)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model.Session) {
+@foreach (var item in Model.StudentInCourse) {
         <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.StartTime)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.EndTime)
-            </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Course.Name)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Room.Name)
+                @Html.DisplayFor(modelItem => item.Student.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Student.Code)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Status)
@@ -64,6 +62,7 @@
                                 <a class="dropdown-item" asp-page="./Edit" asp-route-id="@item.Id">Edit</a>
                                 <a class="dropdown-item" asp-page="./Details" asp-route-id="@item.Id">Details</a>
                                 <a class="dropdown-item" asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+                                <a class="dropdown-item" asp-page="/CourseManagement/StudentInCourses/Index" asp-route-courseId="@item.Id">View course's students</a>
                             </div>
                         </div>
                     }

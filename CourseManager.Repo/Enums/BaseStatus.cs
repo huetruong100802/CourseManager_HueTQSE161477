@@ -8,7 +8,7 @@ namespace CourseManager.Repo.Enums
 {
     public enum BaseStatus
     {
-        Inactive = 0,
-        Active = 1,
+        Disabled = 0,
+        Ok = 1,
     }
 }

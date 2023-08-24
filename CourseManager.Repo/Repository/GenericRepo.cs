@@ -58,7 +58,7 @@ namespace CourseManager.Repo.Repository
         public void SoftRemove(TEntity entity)
         {
             _context.ChangeTracker.Clear();
-            entity.Status = BaseStatus.Inactive;
+            entity.Status = BaseStatus.Disabled;
             _dbSet.Update(entity);
         }
 

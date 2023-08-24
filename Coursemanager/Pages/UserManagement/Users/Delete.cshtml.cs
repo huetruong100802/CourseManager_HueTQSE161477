@@ -6,54 +6,57 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using CourseManager.Repo.Models;
+using AutoMapper;
+using CourseManager.Service.Interfaces;
+using CourseManager.Service.ViewModels;
 
 namespace CourseManager.Pages.UserManagement.Users
 {
     public class DeleteModel : PageModel
     {
-        private readonly CourseManager.Repo.Models.CourseManagerDBContext _context;
-
-        public DeleteModel(CourseManager.Repo.Models.CourseManagerDBContext context)
+        private readonly IUserService _context;
+        private readonly IMapper _mapper;
+        public DeleteModel(IUserService context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         [BindProperty]
-      public User User { get; set; } = default!;
+        public UserViewModel User { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
-            if (id == null || _context.Users == null)
+            if (id == null || await _context.GetAll() == null)
             {
                 return NotFound();
             }
 
-            var user = await _context.Users.FirstOrDefaultAsync(m => m.Id == id);
+            var user = await _context.Get(u => u.Id == id,x=>x.Role);
 
             if (user == null)
             {
                 return NotFound();
             }
-            else 
+            else
             {
-                User = user;
+                User = _mapper.Map<UserViewModel>(user);
             }
             return Page();
         }
 
         public async Task<IActionResult> OnPostAsync(int? id)
         {
-            if (id == null || _context.Users == null)
+            if (id == null || await _context.GetAll() == null)
             {
                 return NotFound();
             }
-            var user = await _context.Users.FindAsync(id);
+            var user = await _context.GetById((int)id);
 
             if (user != null)
             {
-                User = user;
-                _context.Users.Remove(User);
-                await _context.SaveChangesAsync();
+                await _context.Delete(user);
+                User = _mapper.Map<UserViewModel>(user);
             }
 
             return RedirectToPage("./Index");

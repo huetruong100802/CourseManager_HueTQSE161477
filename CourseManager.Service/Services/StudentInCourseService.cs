@@ -17,5 +17,10 @@ namespace CourseManager.Service.Services
         public StudentInCourseService(IUnitOfWork unitOfWork, IGenericRepo<StudentInCourse> repo) : base(unitOfWork, repo)
         {
         }
+
+        public bool CheckStudentInCourse(int studentId, int courseId)
+        {
+            return _unitOfWork.StudentInCourseRepo.CheckStudentInCourse(studentId,courseId);
+        }
     }
 }

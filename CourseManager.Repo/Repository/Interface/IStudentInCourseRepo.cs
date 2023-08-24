@@ -2,5 +2,7 @@
 
 namespace CourseManager.Repo.Repository.Interface
 {
-    public interface IStudentInCourseRepo : IGenericRepo<StudentInCourse> { }
+    public interface IStudentInCourseRepo : IGenericRepo<StudentInCourse> {
+        bool CheckStudentInCourse(int studentId,int courseId);
+    }
 }

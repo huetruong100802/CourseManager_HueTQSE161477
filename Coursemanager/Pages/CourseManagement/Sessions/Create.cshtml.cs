@@ -6,39 +6,47 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using CourseManager.Repo.Models;
+using AutoMapper;
+using CourseManager.Service.Interfaces;
+using CourseManager.Service.ViewModels;
 
 namespace CourseManager.Pages.Sessions
 {
     public class CreateModel : PageModel
     {
-        private readonly CourseManager.Repo.Models.CourseManagerDBContext _context;
+        private readonly ISessionService _context;
+        private readonly ICourseService _courseService;
+        private readonly IRoomService _roomService;
+        private readonly IMapper _mapper;
 
-        public CreateModel(CourseManager.Repo.Models.CourseManagerDBContext context)
+        public CreateModel(ISessionService context, IMapper mapper, ICourseService courseService, IRoomService roomService)
         {
             _context = context;
+            _mapper = mapper;
+            _courseService = courseService;
+            _roomService = roomService;
         }
 
-        public IActionResult OnGet()
+        public async Task<IActionResult> OnGetAsync()
         {
-        ViewData["CourseId"] = new SelectList(_context.Courses, "Id", "Name");
-        ViewData["RoomId"] = new SelectList(_context.Rooms, "Id", "Name");
+            ViewData["CourseId"] = new SelectList(await _courseService.GetAll(), "Id", "Name");
+            ViewData["RoomId"] = new SelectList(await _roomService.GetAll(), "Id", "Name");
             return Page();
         }
 
         [BindProperty]
-        public Session Session { get; set; } = default!;
-        
+        public SessionViewModel Session { get; set; } = default!;
+
 
         // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
         public async Task<IActionResult> OnPostAsync()
         {
-          if (!ModelState.IsValid || _context.Sessions == null || Session == null)
+            if (!ModelState.IsValid || await _context.GetAll() == null || Session == null)
             {
                 return Page();
             }
 
-            _context.Sessions.Add(Session);
-            await _context.SaveChangesAsync();
+            await _context.Add(_mapper.Map<Session>(Session));
 
             return RedirectToPage("./Index");
         }

@@ -7,36 +7,45 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CourseManager.Repo.Models;
+using AutoMapper;
+using CourseManager.Service.Interfaces;
+using CourseManager.Service.ViewModels;
 
 namespace CourseManager.Pages.Sessions
 {
     public class EditModel : PageModel
     {
-        private readonly CourseManager.Repo.Models.CourseManagerDBContext _context;
+        private readonly ISessionService _context; 
+        private readonly ICourseService _courseService;
+        private readonly IRoomService _roomService;
+        private readonly IMapper _mapper;
 
-        public EditModel(CourseManager.Repo.Models.CourseManagerDBContext context)
+        public EditModel(ISessionService context, IMapper mapper, ICourseService courseService, IRoomService roomService)
         {
             _context = context;
+            _mapper = mapper;
+            _courseService = courseService;
+            _roomService = roomService;
         }
 
         [BindProperty]
-        public Session Session { get; set; } = default!;
+        public SessionViewModel Session { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
-            if (id == null || _context.Sessions == null)
+            if (id == null || await _context.GetAll() == null)
             {
                 return NotFound();
             }
 
-            var session =  await _context.Sessions.FirstOrDefaultAsync(m => m.Id == id);
+            var session = await _context.GetById((int)id);
             if (session == null)
             {
                 return NotFound();
             }
-            Session = session;
-           ViewData["CourseId"] = new SelectList(_context.Courses, "Id", "Name");
-           ViewData["RoomId"] = new SelectList(_context.Rooms, "Id", "Name");
+            Session = _mapper.Map<SessionViewModel>(session);
+           ViewData["CourseId"] = new SelectList(await _courseService.GetAll(), "Id", "Name");
+           ViewData["RoomId"] = new SelectList(await _roomService.GetAll(), "Id", "Name");
             return Page();
         }
 
@@ -49,15 +58,13 @@ namespace CourseManager.Pages.Sessions
                 return Page();
             }
 
-            _context.Attach(Session).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                await _context.Update(_mapper.Map<Session>(Session));
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!SessionExists(Session.Id))
+                if (!await SessionExists(Session.Id))
                 {
                     return NotFound();
                 }
@@ -70,9 +77,9 @@ namespace CourseManager.Pages.Sessions
             return RedirectToPage("./Index");
         }
 
-        private bool SessionExists(int id)
+        private async Task<bool> SessionExists(int id)
         {
-          return (_context.Sessions?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (await _context.GetById(id) != null);
         }
     }
 }

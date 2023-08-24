@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using CourseManager.Repo.Models;
 
 #nullable disable
@@ -12,7 +13,7 @@ namespace CourseManager.Service.ViewModels
         {
             StudentInCourses = new HashSet<StudentInCourseViewModel>();
         }
-
+        [Required]
         public string Name { get; set; }
         public string Code { get; set; }
         public string Email { get; set; }

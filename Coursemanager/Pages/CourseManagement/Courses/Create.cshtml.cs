@@ -6,39 +6,47 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using CourseManager.Repo.Models;
+using AutoMapper;
+using CourseManager.Service.Interfaces;
+using CourseManager.Service.ViewModels;
 
 namespace CourseManager.Pages.Courses
 {
     public class CreateModel : PageModel
     {
-        private readonly CourseManager.Repo.Models.CourseManagerDBContext _context;
+        private readonly ICourseService _context;
+        private readonly ISemesterService _semesterService;
+        private readonly ISubjectService _subjectService;
+        private readonly IMapper _mapper;
 
-        public CreateModel(CourseManager.Repo.Models.CourseManagerDBContext context)
+        public CreateModel(ICourseService context, IMapper mapper, ISemesterService semesterService, ISubjectService subjectService)
         {
             _context = context;
+            _mapper = mapper;
+            _semesterService = semesterService;
+            _subjectService = subjectService;
         }
 
-        public IActionResult OnGet()
+        public async Task<IActionResult> OnGet()
         {
-        ViewData["SemesterId"] = new SelectList(_context.Semesters, "Id", "Name");
-        ViewData["SubjectId"] = new SelectList(_context.Subjects, "Id", "Name");
+        ViewData["SemesterId"] = new SelectList(await _semesterService.GetAll(), "Id", "Name");
+        ViewData["SubjectId"] = new SelectList(await _subjectService.GetAll(), "Id", "Name");
             return Page();
         }
 
         [BindProperty]
-        public Course Course { get; set; } = default!;
-        
+        public CourseViewModel Course { get; set; } = default!;
+
 
         // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
         public async Task<IActionResult> OnPostAsync()
         {
-          if (!ModelState.IsValid || _context.Courses == null || Course == null)
+            if (!ModelState.IsValid || await _context.GetAll() == null || Course == null)
             {
                 return Page();
             }
 
-            _context.Courses.Add(Course);
-            await _context.SaveChangesAsync();
+            await _context.Add(_mapper.Map<Course>(Course));
 
             return RedirectToPage("./Index");
         }

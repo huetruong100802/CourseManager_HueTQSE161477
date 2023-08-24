@@ -6,38 +6,44 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using CourseManager.Repo.Models;
+using AutoMapper;
+using CourseManager.Service.Interfaces;
+using CourseManager.Service.ViewModels;
 
 namespace CourseManager.Pages.Subjects
 {
     public class CreateModel : PageModel
     {
-        private readonly CourseManager.Repo.Models.CourseManagerDBContext _context;
+        private readonly ISubjectService _context;
+        private readonly IMajorService _majorService;
+        private readonly IMapper _mapper;
 
-        public CreateModel(CourseManager.Repo.Models.CourseManagerDBContext context)
+        public CreateModel(ISubjectService context, IMapper mapper, IMajorService majorService)
         {
             _context = context;
+            _mapper = mapper;
+            _majorService = majorService;
         }
 
-        public IActionResult OnGet()
+        public async Task<IActionResult> OnGet()
         {
-        ViewData["MajorId"] = new SelectList(_context.Majors, "Id", "Name");
+        ViewData["MajorId"] = new SelectList(await _majorService.GetAll(), "Id", "Name");
             return Page();
         }
 
         [BindProperty]
-        public Subject Subject { get; set; } = default!;
-        
+        public SubjectViewModel Subject { get; set; } = default!;
+
 
         // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
         public async Task<IActionResult> OnPostAsync()
         {
-          if (!ModelState.IsValid || _context.Subjects == null || Subject == null)
+            if (!ModelState.IsValid || await _context.GetAll() == null || Subject == null)
             {
                 return Page();
             }
 
-            _context.Subjects.Add(Subject);
-            await _context.SaveChangesAsync();
+            await _context.Add(_mapper.Map<Subject>(Subject));
 
             return RedirectToPage("./Index");
         }
