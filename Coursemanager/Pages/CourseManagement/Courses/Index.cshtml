@@ -4,12 +4,16 @@
 @{
     ViewData["Title"] = "Index";
     var page = Model.Pagination;
+    var isAdmin = ((System.Security.Claims.ClaimsIdentity)User.Identity!).HasClaim(System.Security.Claims.ClaimTypes.Role, "Admin");
 }
 
 <h1>Index</h1>
 
 <p>
+    @if (isAdmin)
+    {
     <a asp-page="Create" class="btn btn-primary">Create New +</a>
+    }
     <form class="d-flex" asp-page="Index" method="get">
         <input class="form-control me-sm-2" type="search" placeholder="Search" asp-for="@Model.SearchString">
         <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>

@@ -30,20 +30,13 @@ namespace CourseManager.Pages.Subjects
         public string? SearchString { get; set; }
         public async Task OnGetAsync(int? index)
         {
-            var pagination = await _context.GetByPage(index ?? 0, 3);
+            SearchString = (SearchString ?? "").Trim().ToLower();
+            var pagination = await _context.GetByPage(x => x.Name.ToLower().Contains(SearchString), index ?? 0, 3,x=>x.Major);
             if (pagination != null)
             {
                 Pagination = _mapper.Map<Pagination<SubjectViewModel>>(pagination);
                 Subject = Pagination.Items.OrderBy(x => x.Name).ToList();
-                if (SearchString != null)
-                {
-                    SearchString = SearchString.Trim().ToLower();
-                    Subject = Subject.Where(x => x.Name.ToLower().Contains(SearchString)).ToList();
-                    Pagination.TotalItemsCount = Subject.Count;
-                    Pagination.Items = Subject;
-                }
             }
-
         }
     }
 }

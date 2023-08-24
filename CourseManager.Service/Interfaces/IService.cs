@@ -18,8 +18,8 @@ namespace CourseManager.Service.Interfaces
         Task<bool> Delete(T item);
         Task<bool> Update(T item);
         Task<T> GetById(int id);
-        Task<T> Get(params Expression<Func<T, object>>[] includes);
-        Task<Pagination<T>> GetByPage(int page = 0, int pageSize = 10);
-        Task<Pagination<T>> GetByPage(Expression<Func<T, bool>> expression, int pageIndex = 0, int pageSize = 10);
+        Task<T> Get(Expression<Func<T, bool>> expression,params Expression<Func<T, object>>[] includes);
+        Task<Pagination<T>> GetByPage(int page = 0, int pageSize = 10, params Expression<Func<T, object>>[] includes);
+        Task<Pagination<T>> GetByPage(Expression<Func<T, bool>> expression, int pageIndex = 0, int pageSize = 10, params Expression<Func<T, object>>[] includes);
     }
 }

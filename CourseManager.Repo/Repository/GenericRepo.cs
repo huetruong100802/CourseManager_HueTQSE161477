@@ -46,13 +46,13 @@ namespace CourseManager.Repo.Repository
                .AsNoTracking();
             return await query.SingleOrDefaultAsync(x => x.Id.Equals(id));
         }
-        public async Task<TEntity?> GetAsync(params Expression<Func<TEntity, object>>[] includes)
+        public async Task<TEntity?> GetAsync(Expression<Func<TEntity, bool>> expression, params Expression<Func<TEntity, object>>[] includes)
         {
             var query = includes
                .Aggregate(_dbSet.AsQueryable(),
                    (entity, property) => entity.Include(property))
                .AsNoTracking();
-            return await query.FirstAsync();
+            return await query.FirstOrDefaultAsync(expression);
         }
 
         public void SoftRemove(TEntity entity)
@@ -67,20 +67,23 @@ namespace CourseManager.Repo.Repository
             _dbSet.Update(entity);
         }
 
-        public Task<Pagination<TEntity>> ToPagination(int pageIndex = 0, int pageSize = 10)
+        public Task<Pagination<TEntity>> ToPagination(int pageIndex = 0, int pageSize = 10, params Expression<Func<TEntity, object>>[] includes)
         {
-            return ToPagination(x => true, pageIndex, pageSize);
+            return ToPagination(x => true, pageIndex, pageSize,includes);
         }
 
-        public Task<Pagination<TEntity>> ToPagination(Expression<Func<TEntity, bool>> expression, int pageIndex = 0, int pageSize = 10)
+        public Task<Pagination<TEntity>> ToPagination(Expression<Func<TEntity, bool>> expression, int pageIndex = 0, int pageSize = 10, params Expression<Func<TEntity, object>>[] includes)
         {
-            return ToPagination(_dbSet, expression, pageIndex, pageSize);
+            return ToPagination(_dbSet, expression, pageIndex, pageSize,includes);
         }
-
-        public async Task<Pagination<TEntity>> ToPagination(IQueryable<TEntity> value, Expression<Func<TEntity, bool>> expression, int pageIndex, int pageSize)
+        public async Task<Pagination<TEntity>> ToPagination(IQueryable<TEntity> value, Expression<Func<TEntity, bool>> expression, int pageIndex, int pageSize, params Expression<Func<TEntity, object>>[] includes)
         {
-            var itemCount = await value.Where(expression).CountAsync();
-            var items = await value.Where(expression)
+            var query = includes
+               .Aggregate(_dbSet.AsQueryable(),
+                   (entity, property) => entity.Include(property))
+               .AsNoTracking();
+            var itemCount = await query.Where(expression).CountAsync();
+            var items = await query.Where(expression)
                                     .Skip(pageIndex * pageSize)
                                     .Take(pageSize)
                                     .OrderBy(x => x.Id)
@@ -97,6 +100,5 @@ namespace CourseManager.Repo.Repository
 
             return result;
         }
-
     }
 }

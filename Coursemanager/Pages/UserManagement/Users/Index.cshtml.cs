@@ -31,7 +31,7 @@ namespace CourseManager.Pages.UserManagement.Users
         public async Task OnGetAsync(int? index)
         {
             SearchString = (SearchString ?? "").Trim().ToLower();
-            var pagination = await _context.GetByPage(x=>x.Username.ToLower().Contains(SearchString), index ?? 0, 3);
+            var pagination = await _context.GetByPage(x=>x.Username.ToLower().Contains(SearchString), index ?? 0, 3,x=>x.Role);
             if (pagination != null)
             {
                 Pagination = _mapper.Map<Pagination<UserViewModel>>(pagination);

@@ -3,5 +3,7 @@ using CourseManager.Service.ViewModels;
 
 namespace CourseManager.Service.Interfaces
 {
-    public interface IUserService : IService<User> { }
+    public interface IUserService : IService<User>
+    {
+    }
 }

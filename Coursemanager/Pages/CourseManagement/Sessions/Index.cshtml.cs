@@ -30,18 +30,12 @@ namespace CourseManager.Pages.Sessions
         public string? SearchString { get; set; }
         public async Task OnGetAsync(int? index)
         {
-            var pagination = await _context.GetByPage(index ?? 0, 3);
+            SearchString = (SearchString ?? "").Trim().ToLower();
+            var pagination = await _context.GetByPage(x => x.StartTime.ToString().ToLower().Contains(SearchString), index ?? 0, 3,x=>x.Course,y=>y.Room);
             if (pagination != null)
             {
                 Pagination = _mapper.Map<Pagination<SessionViewModel>>(pagination);
-                Session = Pagination.Items.OrderBy(x => x.Id).ToList();
-                if (SearchString != null)
-                {
-                    SearchString = SearchString.Trim();
-                    Session = Session.Where(x => x.StartTime.ToString().Contains(SearchString)).ToList();
-                    Pagination.TotalItemsCount = Session.Count;
-                    Pagination.Items = Session;
-                }
+                Session = Pagination.Items.OrderBy(x => x.StartTime.ToString()).ToList();
             }
 
         }

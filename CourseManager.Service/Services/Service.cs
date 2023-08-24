@@ -9,7 +9,7 @@ namespace CourseManager.Service.Services
 {
     public class Service<T> : IService<T> where T : BaseEntity
     {
-        private readonly IUnitOfWork _unitOfWork;
+        protected readonly IUnitOfWork _unitOfWork;
         private readonly IGenericRepo<T> _repo;
 
         public Service(IUnitOfWork unitOfWork, IGenericRepo<T> repo)
@@ -29,9 +29,9 @@ namespace CourseManager.Service.Services
             return await _unitOfWork.SaveChangeAsync() > 0;
         }
 
-        public async Task<T> Get(params Expression<Func<T, object>>[] includes)
+        public async Task<T> Get(Expression<Func<T, bool>> expression,params Expression<Func<T, object>>[] includes)
         {
-            return (await _repo.GetAsync(includes))!;
+            return (await _repo.GetAsync(expression,includes))!;
         }
 
         public async Task<List<T>> GetAll()
@@ -44,14 +44,14 @@ namespace CourseManager.Service.Services
             return (await _repo.GetByIdAsync(id))!;
         }
 
-        public Task<Pagination<T>> GetByPage(int page = 0, int pageSize = 10)
+        public async Task<Pagination<T>> GetByPage(int page = 0, int pageSize = 10, params Expression<Func<T, object>>[] includes)
         {
-            return _repo.ToPagination(page, pageSize);
+            return await _repo.ToPagination(page, pageSize,includes);
         }
 
-        public Task<Pagination<T>> GetByPage(Expression<Func<T, bool>> expression, int pageIndex = 0, int pageSize = 10)
+        public async Task<Pagination<T>> GetByPage(Expression<Func<T, bool>> expression, int pageIndex = 0, int pageSize = 10, params Expression<Func<T, object>>[] includes)
         {
-            return _repo.ToPagination(expression, pageIndex, pageSize);
+            return await _repo.ToPagination(expression, pageIndex, pageSize, includes);
         }
 
         public async Task<bool> Update(T item)

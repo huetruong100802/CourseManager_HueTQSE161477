@@ -30,18 +30,12 @@ namespace CourseManager.Pages.Semesters
         public string? SearchString { get; set; }
         public async Task OnGetAsync(int? index)
         {
-            var pagination = await _context.GetByPage(index ?? 0, 3);
+            SearchString = (SearchString ?? "").Trim().ToLower();
+            var pagination = await _context.GetByPage(x => x.Name.ToLower().Contains(SearchString), index ?? 0, 3);
             if (pagination != null)
             {
                 Pagination = _mapper.Map<Pagination<SemesterViewModel>>(pagination);
                 Semester = Pagination.Items.OrderBy(x => x.Name).ToList();
-                if (SearchString != null)
-                {
-                    SearchString = SearchString.Trim().ToLower();
-                    Semester = Semester.Where(x => x.Name.ToLower().Contains(SearchString)).ToList();
-                    Pagination.TotalItemsCount = Semester.Count;
-                    Pagination.Items = Semester;
-                }
             }
 
         }
