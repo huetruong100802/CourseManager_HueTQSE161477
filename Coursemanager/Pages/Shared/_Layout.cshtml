@@ -30,22 +30,18 @@
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="true">Course Management</a>
                             <div class="dropdown-menu">
-                                <a class="dropdown-item" href="CourseManagement/Semesters" >Semester</a>
-                                <a class="dropdown-item" href="CourseManagement/Majors">Major</a>
-                                <a class="dropdown-item" href="CourseManagement/Subjects">Subject</a>
-                                <a class="dropdown-item" href="CourseManagement/Students">Student</a>
-                                <a class="dropdown-item" href="CourseManagement/Courses">Course</a>
+                                <a class="dropdown-item" asp-area="" asp-page="/CourseManagement/Semesters/Index">Semester</a>
+                                <a class="dropdown-item" asp-area="" asp-page="/CourseManagement/Majors/Index">Major</a>
+                                <a class="dropdown-item" asp-area="" asp-page="/CourseManagement/Subjects/Index">Subject</a>
+                                <a class="dropdown-item" asp-area="" asp-page="/CourseManagement/Students/Index">Student</a>
+                                <a class="dropdown-item" asp-area="" asp-page="/CourseManagement/Courses/Index">Course</a>
                                 <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="CourseManagement/Rooms">Room</a>
-                                <a class="dropdown-item" href="CourseManagement/Sessions">Session</a>
+                                <a class="dropdown-item" asp-area="" asp-page="/CourseManagement/Rooms/Index">Room</a>
+                                <a class="dropdown-item" asp-area="" asp-page="/CourseManagement/Sessions/Index">Session</a>
                             </div>
                         </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="true">User Management</a>
-                            <div class="dropdown-menu">
-                                <a class="dropdown-item" href="#">User</a>
-                                <a class="dropdown-item" href="#">Role</a>
-                            </div>
+                        <li class="nav-item">
+                            <a class="nav-link text-light" asp-area="" asp-page="/UserManagement/Users/Index">User Management</a>
                         </li>
                     </ul>
                 </div>

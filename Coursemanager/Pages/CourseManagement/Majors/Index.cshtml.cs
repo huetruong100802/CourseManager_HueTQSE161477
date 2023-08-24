@@ -6,26 +6,44 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using CourseManager.Repo.Models;
+using AutoMapper;
+using CourseManager.Repo.Commons;
+using CourseManager.Service.Interfaces;
+using CourseManager.Service.ViewModels;
 
 namespace CourseManager.Pages.Majors
 {
     public class IndexModel : PageModel
     {
-        private readonly CourseManager.Repo.Models.CourseManagerDBContext _context;
+        private readonly IMajorService _context;
+        private readonly IMapper _mapper;
 
-        public IndexModel(CourseManager.Repo.Models.CourseManagerDBContext context)
+        public IndexModel(IMajorService context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
-        public IList<Major> Major { get;set; } = default!;
-
-        public async Task OnGetAsync()
+        public IList<MajorViewModel> Major { get; set; } = default!;
+        public Pagination<MajorViewModel> Pagination { get; set; } = default!;
+        [BindProperty(SupportsGet = true)]
+        public string? SearchString { get; set; }
+        public async Task OnGetAsync(int? index)
         {
-            if (_context.Majors != null)
+            var pagination = await _context.GetByPage(index ?? 0, 3);
+            if (pagination != null)
             {
-                Major = await _context.Majors.ToListAsync();
+                Pagination = _mapper.Map<Pagination<MajorViewModel>>(pagination);
+                Major = Pagination.Items.OrderBy(x => x.Name).ToList();
+                if (SearchString != null)
+                {
+                    SearchString = SearchString.Trim().ToLower();
+                    Major = Major.Where(x => x.Name.ToLower().Contains(SearchString)).ToList();
+                    Pagination.TotalItemsCount = Major.Count;
+                    Pagination.Items = Major;
+                }
             }
+
         }
     }
 }

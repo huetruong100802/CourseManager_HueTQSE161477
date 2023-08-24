@@ -1,8 +1,7 @@
 ﻿using CourseManager.Repo.Commons;
 using CourseManager.Repo.Models;
 using CourseManager.Repo.Repository;
-using CourseManager.Repo.Repository.Interface;
-using CourseManager.Repo.UnitOfWorks;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +19,7 @@ namespace CourseManager.Service.Interfaces
         Task<bool> Update(T item);
         Task<T> GetById(int id);
         Task<T> Get(params Expression<Func<T, object>>[] includes);
-        Task<Pagination<T>> GetByPage(int page, int pageSize);
+        Task<Pagination<T>> GetByPage(int page = 0, int pageSize = 10);
+        Task<Pagination<T>> GetByPage(Expression<Func<T, bool>> expression, int pageIndex = 0, int pageSize = 10);
     }
 }

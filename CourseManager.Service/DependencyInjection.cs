@@ -33,6 +33,7 @@ namespace CourseManager.Service
             services.AddScoped<IStudentService, StudentService>();
             services.AddScoped<ISubjectService, SubjectService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped(typeof(IGenericRepo<>),typeof(GenericRepo<>));
             #endregion
             #region Repositories
             services.AddScoped<IAttendanceRepo, AttendanceRepo>();

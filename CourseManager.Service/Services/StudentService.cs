@@ -1,5 +1,6 @@
 ﻿using CourseManager.Repo.Commons;
 using CourseManager.Repo.Models;
+using CourseManager.Repo.Repository.Interface;
 using CourseManager.Repo.UnitOfWorks;
 using CourseManager.Service.Interfaces;
 using System;
@@ -11,51 +12,10 @@ using System.Threading.Tasks;
 
 namespace CourseManager.Service.Services
 {
-    public class StudentService : IStudentService
+    public class StudentService : Service<Student>, IStudentService
     {
-        private readonly IUnitOfWork _unitOfWork;
-
-        public StudentService(IUnitOfWork unitOfWork)
+        public StudentService(IUnitOfWork unitOfWork, IGenericRepo<Student> repo) : base(unitOfWork, repo)
         {
-            _unitOfWork = unitOfWork;
-        }
-
-        public async Task<bool> Add(Student item)
-        {
-            await _unitOfWork.StudentRepo.AddAsync(item);
-            return await _unitOfWork.SaveChangeAsync() > 0;
-        }
-
-        public async Task<bool> Delete(Student item)
-        {
-            _unitOfWork.StudentRepo.SoftRemove(item);
-            return await _unitOfWork.SaveChangeAsync() > 0;
-        }
-
-        public async Task<Student> Get(params Expression<Func<Student, object>>[] includes)
-        {
-            return (await _unitOfWork.StudentRepo.GetAsync(includes))!;
-        }
-
-        public async Task<List<Student>> GetAll()
-        {
-            return await _unitOfWork.StudentRepo.GetAllAsync();
-        }
-
-        public async Task<Student> GetById(int id)
-        {
-            return (await _unitOfWork.StudentRepo.GetByIdAsync(id))!;
-        }
-
-        public async Task<Pagination<Student>> GetByPage(int page, int pageSize)
-        {   
-            return await _unitOfWork.StudentRepo.ToPagination(page, pageSize);
-        }
-
-        public async Task<bool> Update(Student item)
-        {
-            _unitOfWork.StudentRepo.Update(item);
-            return await _unitOfWork.SaveChangeAsync() > 0;
         }
     }
 }

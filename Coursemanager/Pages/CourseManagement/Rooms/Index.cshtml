@@ -4,7 +4,6 @@
 @{
     ViewData["Title"] = "Index";
     var page = Model.Pagination;
-    var currentPageIndex = Model.Pagination.PageIndex;
 }
 
 <h1>Index</h1>
@@ -70,16 +69,16 @@
             @if (page.Previous)
             {
                 <li class="page-item">
-                    <a class="page-link" asp-page="Index" asp-route-index="@(currentPageIndex-1)">&laquo;</a>
+                    <a class="page-link" asp-page="Index" asp-route-index="@(page.PageIndex-1)">&laquo;</a>
                 </li>
             }
             <li class="page-item">
-                <p class="page-link">@(currentPageIndex + 1) of @(page.TotalPagesCount)</p>
+                <p class="page-link">@(page.PageIndex + 1) of @(page.TotalPagesCount)</p>
             </li>
             @if (page.Next)
             {
                 <li class="page-item">
-                    <a class="page-link" asp-page="Index" asp-route-index="@(currentPageIndex+1)">&raquo;</a>
+                    <a class="page-link" asp-page="Index" asp-route-index="@(page.PageIndex+1)">&raquo;</a>
                 </li>
             }
         </ul>
