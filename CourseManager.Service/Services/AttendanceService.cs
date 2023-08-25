@@ -13,5 +13,10 @@ namespace CourseManager.Service.Services
         public AttendanceService(IUnitOfWork unitOfWork, IGenericRepo<Attendance> repo) : base(unitOfWork, repo)
         {
         }
+
+        public async Task<Pagination<Attendance>> LoadSession(int sessionId, int pageIndex = 0, int pageSize = 10)
+        {
+            return await _unitOfWork.AttendanceRepo.LoadSession(sessionId, pageIndex, pageSize);
+        }
     }
 }

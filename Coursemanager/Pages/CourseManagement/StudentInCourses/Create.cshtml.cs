@@ -57,7 +57,11 @@ namespace CourseManager.Pages.CourseManagement.StudentInCourses
             {
                 return Page();
             }
-
+            if (_context.CheckStudentInCourse(StudentInCourse.StudentId, StudentInCourse.CourseId))
+            {
+                ModelState.AddModelError("","This student is already in the course!");
+                return Page();
+            }
             await _context.Add(_mapper.Map<CourseManager.Repo.Models.StudentInCourse>(StudentInCourse));
 
             return RedirectToPage("./Index", new { courseId = StudentInCourse.CourseId });

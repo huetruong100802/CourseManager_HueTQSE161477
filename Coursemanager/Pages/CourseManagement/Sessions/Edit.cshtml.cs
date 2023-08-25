@@ -74,7 +74,7 @@ namespace CourseManager.Pages.Sessions
                 }
             }
 
-            return RedirectToPage("./Index");
+            return RedirectToPage("./Index", new { courseId = Session.CourseId });
         }
 
         private async Task<bool> SessionExists(int id)

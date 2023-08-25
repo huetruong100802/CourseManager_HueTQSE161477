@@ -26,10 +26,15 @@ namespace CourseManager.Pages.Sessions
             _courseService = courseService;
             _roomService = roomService;
         }
+        public Course Course { get; set; }
 
-        public async Task<IActionResult> OnGetAsync()
+        public async Task<IActionResult> OnGetAsync(int courseId)
         {
-            ViewData["CourseId"] = new SelectList(await _courseService.GetAll(), "Id", "Name");
+            Course = await _courseService.Get(u=>u.Id==courseId,x=>x.Sessions);
+            if (Course == null)
+            {
+                return NotFound();
+            }
             ViewData["RoomId"] = new SelectList(await _roomService.GetAll(), "Id", "Name");
             return Page();
         }
@@ -45,10 +50,9 @@ namespace CourseManager.Pages.Sessions
             {
                 return Page();
             }
-
+            
             await _context.Add(_mapper.Map<Session>(Session));
-
-            return RedirectToPage("./Index");
+            return RedirectToPage("./Index", new { courseId = Session.CourseId });
         }
     }
 }

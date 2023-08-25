@@ -14,5 +14,10 @@ namespace CourseManager.Repo.Repository
         {
             return _dbSet.Any(u => u.StudentId == studentId && u.CourseId == courseId);
         }
+
+        public bool CheckStudentInCourse(string studentName, int courseId)
+        {
+            return _dbSet.Any(u => u.Student.Name==studentName && u.CourseId == courseId);
+        }
     }
 }

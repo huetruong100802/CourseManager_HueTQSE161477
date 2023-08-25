@@ -32,7 +32,7 @@ namespace CourseManager.Pages.Sessions
                 return NotFound();
             }
 
-            var session = await _context.GetById((int)id);
+            var session = await _context.Get(u => u.Id == id, x => x.Course, y => y.Room);
             if (session == null)
             {
                 return NotFound();

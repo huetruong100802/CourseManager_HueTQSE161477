@@ -25,6 +25,7 @@ namespace CourseManager.Repo.Repository
 
         public async Task AddAsync(TEntity entity)
         {
+            _context.ChangeTracker.Clear();
             entity.Id = _dbSet.OrderBy(x => x.Id).Last().Id+1;
             await _dbSet.AddAsync(entity);
         }
@@ -64,7 +65,13 @@ namespace CourseManager.Repo.Repository
 
         public void Update(TEntity entity)
         {
+            _context.ChangeTracker.Clear();
             _dbSet.Update(entity);
+        }
+
+        public void UpdateRange(List<TEntity> entity)
+        {
+            _dbSet.UpdateRange(entity);
         }
 
         public Task<Pagination<TEntity>> ToPagination(int pageIndex = 0, int pageSize = 10, params Expression<Func<TEntity, object>>[] includes)

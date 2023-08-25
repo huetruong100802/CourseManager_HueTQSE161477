@@ -47,6 +47,7 @@ namespace WebApplication1
                 options.Conventions.AuthorizePage("/CourseManagement/StudentInCourses/Edit", ADMIN_POLICY);
                 options.Conventions.AuthorizePage("/CourseManagement/StudentInCourses/Delete", ADMIN_POLICY);
                 options.Conventions.AuthorizeFolder("/UserManagement", ADMIN_POLICY);
+                options.Conventions.AuthorizeFolder("/CourseManagement/Attendances", LECTURER_POLICY);
             });
             var app = builder.Build();
 

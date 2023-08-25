@@ -8,7 +8,10 @@
 <h1>Details</h1>
 
 <div>
-    <h4>Course | <a class="link-info" asp-page="/CourseManagement/StudentInCourses/Index" asp-route-courseId="@Model.Course.Id">View course's students</a></h4>
+    <h4>Course 
+        | <a class="btn btn-info" asp-page="/CourseManagement/StudentInCourses/Index" asp-route-courseId="@Model.Course.Id">View course's students</a>
+        | <a class="btn btn-info" asp-page="/CourseManagement/Sessions/Index" asp-route-courseId="@Model.Course.Id">View course's sessions</a>
+    </h4>
     <hr />
     <dl class="row">
         <dt class="col-sm-2">

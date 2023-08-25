@@ -2,5 +2,6 @@
 
 namespace CourseManager.Repo.Repository.Interface
 {
-    public interface ISessionRepo : IGenericRepo<Session> { }
+    public interface ISessionRepo : IGenericRepo<Session> {
+    }
 }

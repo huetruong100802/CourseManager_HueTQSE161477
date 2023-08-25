@@ -17,6 +17,7 @@ namespace CourseManager.Service.Interfaces
         Task<bool> Add(T item);
         Task<bool> Delete(T item);
         Task<bool> Update(T item);
+        Task<bool> UpdateRange(List<T> list);
         Task<T> GetById(int id);
         Task<T> Get(Expression<Func<T, bool>> expression,params Expression<Func<T, object>>[] includes);
         Task<Pagination<T>> GetByPage(int page = 0, int pageSize = 10, params Expression<Func<T, object>>[] includes);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using CourseManager.Repo.Models;
 
 #nullable disable
@@ -12,7 +13,7 @@ namespace CourseManager.Service.ViewModels
         {
             Attendances = new HashSet<AttendanceViewModel>();
         }
-
+        [DisplayName("Course")]
         public int CourseId { get; set; }
         public int StudentId { get; set; }
 

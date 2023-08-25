@@ -77,23 +77,20 @@
                 @Html.DisplayFor(modelItem => item.Status)
             </td>
             <td>
-                    @if (isAdmin)
-                    {
-                        <div class="btn-group" role="group">
-                            <button id="btnGroupDrop1" type="button" class="btn btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-                            <div class="dropdown-menu" aria-labelledby="btnGroupDrop1" style="">
+                    <div class="btn-group" role="group">
+                        <button id="btnGroupDrop1" type="button" class="btn btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                        <div class="dropdown-menu" aria-labelledby="btnGroupDrop1" style="">
+                            <a class="dropdown-item" asp-page="./Details" asp-route-id="@item.Id">Details</a>
+                            @if (isAdmin)
+                            {
                                 <a class="dropdown-item" asp-page="./Edit" asp-route-id="@item.Id">Edit</a>
-                                <a class="dropdown-item" asp-page="./Details" asp-route-id="@item.Id">Details</a>
                                 <a class="dropdown-item" asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
-                                <a class="dropdown-item" asp-page="/CourseManagement/StudentInCourses/Index" asp-route-courseId="@item.Id">View course's students</a>
-                            </div>
+                            }
+                            <a class="dropdown-item" asp-page="/CourseManagement/StudentInCourses/Index" asp-route-courseId="@item.Id">View course's students</a>
+                            <a class="dropdown-item" asp-page="/CourseManagement/Sessions/Index" asp-route-courseId="@item.Id">View Session/Check Attendances</a>
                         </div>
-                    }
-                    else
-                    {
-                        <a class="link-info" asp-page="./Details" asp-route-id="@item.Id">Details</a>
-                    }
-                </td>
+                    </div>
+            </td>
         </tr>
 }
     </tbody>

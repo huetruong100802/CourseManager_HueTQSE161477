@@ -59,5 +59,11 @@ namespace CourseManager.Service.Services
             _repo.Update(item);
             return await _unitOfWork.SaveChangeAsync() > 0;
         }
+
+        public async Task<bool> UpdateRange(List<T> list)
+        {
+            _repo.UpdateRange(list);
+            return await _unitOfWork.SaveChangeAsync() > 0;
+        }
     }
 }

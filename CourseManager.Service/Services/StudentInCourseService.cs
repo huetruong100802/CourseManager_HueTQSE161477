@@ -22,5 +22,10 @@ namespace CourseManager.Service.Services
         {
             return _unitOfWork.StudentInCourseRepo.CheckStudentInCourse(studentId,courseId);
         }
+
+        public bool CheckStudentInCourse(string studentName, int courseId)
+        {
+            return _unitOfWork.StudentInCourseRepo.CheckStudentInCourse(studentName, courseId);
+        }
     }
 }
